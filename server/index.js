@@ -1,14 +1,19 @@
 
 const PORT = 8000
+const cors = require('cors')
+
 const express = require('express')
 const { MongoClient } = require('mongodb')
-const {hash} = require("bcrypt");
-const { v4: uuidv4 } = require('uuid')
+const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+
+const uuid = require('uuid')
 
 const uri = 'mongodb+srv://jeremy:toto123@cluster0.yo8nv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
 const app = express()
+app.use(cors())
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.json('Hello to you');
@@ -18,32 +23,37 @@ app.get('/', (req, res) => {
 app.post('/signup',async (req, res) => {
     const client = new MongoClient(uri)
     const { email, password } =  req.body
-    const generatedUserId =  uuidv4()
-    const hashedPassword = await hash(password,10)
+
+    const generatedUserId =  uuid.v4()
+    const hashedPassword = await bcrypt.hash(password,10)
 
     try{
-        client.connect()
+        await client.connect()
         const database = client.db('app-data')
         const users = database.collection('users')
 
-        const existingUser = users.findOne({email})
-        if(existingUser) {
+        const findUser = await users.findOne({email})
+
+        if(findUser) {
             return res.status(409).send('User already exists. Please login')
         }
 
+        const emailToLowerCase = email.toLowerCase()
 
         const data = {
             user_Id: generatedUserId,
-            email: email.toLowerCase(),
+            email: emailToLowerCase,
             hashed_pwd: hashedPassword
         }
         const post_user = await users.insertOne(data)
 
-        const token = jwt.sign(post_user)
+        const token = jwt.sign(post_user, emailToLowerCase, {
+            expiresIn   : 60 * 24,
+        })
+        res.status(201).json({token, userId: generatedUserId, email: emailToLowerCase})
 
-    }finally {
-        await client.close
-
+    }catch (err) {
+        console.log(err)
     }
 })
 

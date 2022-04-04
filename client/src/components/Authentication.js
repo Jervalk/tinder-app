@@ -19,18 +19,15 @@ const Authentication = ({setShowModal, isSignUp}) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            if(isSignUp && (password!== confirmPassword)){
+            if(isSignUp && (password !== confirmPassword)){
                 setError("Password is not the same!")
                 return
-            }else {
-                const res = await axios.post('http://localhost:8000/signup', {email, password})
+            }
+                const response = await axios.post('http://localhost:8000/signup', {email, password})
 
-                const success = res.status === 201
+                const success = response.status === 201
 
                 if(success) navigate('/onboarding')
-            }
-
-
         } catch(error) {
             console.log(error)
         }
