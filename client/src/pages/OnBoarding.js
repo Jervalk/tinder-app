@@ -1,31 +1,42 @@
 import { useState } from "react"
 import Navigation from "../components/Navigation"
+import { useCookies } from 'react-cookie'
+import axios from 'axios'
+import {useNavigate} from 'react-router-dom'
+
 
 const OnBoarding = () => {
 
+    const [cookies, setCookie, removeCookie] = useCookies(['user'])
+    let navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        user_Id: '',
+        user_Id: cookies.UserId,
         firstname: '',
         dob_day: '',
         dob_month: '',
         dob_year: '',
         display_gender: false,
-        gender_identity: 'woman',
+        gender: 'woman',
         gender_interest: 'man',
-        email: '',
         url: '',
         about: '',
         matches: []
     })
 
 
-    const handleSubmit = () => {
-        console.log("Submited for now")
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try{
+            const response = await axios.put('http://localhost:8000/user', {formData})
+            const success = response.status === 200
+            if(success) navigate('/dashboard')
+        }catch (err){
+            console.log(err)
+        }
     }
 
     const handleChange = (e) => {
-        console.log("e", e)
         const value = e.target.type === "checkbox" ? e.target.checked : e.target.value
         const name = e.target.name
 
@@ -34,8 +45,6 @@ const OnBoarding = () => {
             [name] : value
         }))
     }
-
-    console.log(formData)
 
     return (
         <>
@@ -97,28 +106,28 @@ const OnBoarding = () => {
                             <input
                                 id="woman-gender-identity"
                                 type="radio"
-                                name="gender_identity"
+                                name="gender"
                                 value="woman"
                                 onChange={handleChange}
-                                checked={formData.gender_identity === 'woman'}
+                                checked={formData.gender === 'woman'}
                             />
                             <label htmlFor="woman-gender-identity">Femme</label>
                              <input
                                 id="man-gender-identity"
                                 type="radio"
-                                name="gender_identity"
+                                name="gender"
                                 value="man"
                                 onChange={handleChange}
-                                checked={formData.gender_identity === 'man'}
+                                checked={formData.gender === 'man'}
                             />
                             <label htmlFor="man-gender-identity">Homme</label>
                             <input
                                 id="more-gender-identity"
                                 type="radio"
-                                name="gender_identity"
+                                name="gender"
                                 value="more"
                                 onChange={handleChange}
-                                checked={formData.gender_identity === 'more'}
+                                checked={formData.gender === 'more'}
                             />
                             <label htmlFor="more-gender-identity">Plus</label>
                         </div>  
@@ -185,7 +194,7 @@ const OnBoarding = () => {
                             required={true}
                         />
                         <div className="pictures-profil-container">
-                            <img src={formData.url} alt="Profil img"/>
+                            {formData.url && <img src={formData.url} alt="Profil img"/>}
                         </div>
                     </section>
                   

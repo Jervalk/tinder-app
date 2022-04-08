@@ -62,9 +62,12 @@ nav .log-button:disabled {
     width: 100vw;
     height: 100vh;
     position: fixed;
-    background: linear-gradient(to bottom,
+    background-image: linear-gradient(to bottom,
             rgba(0, 0, 0, 0.65) 0%,
-            rgba(0, 0, 0, 0) 100%), url('../src/utils/images/184abbc6dbfb37e127d91e1695d0a468.webp')
+            rgba(0, 0, 0, 0) 100%), url('../src/utils/images/184abbc6dbfb37e127d91e1695d0a468.webp');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .primary-button {
@@ -95,13 +98,12 @@ nav .log-button:disabled {
 
 .confirm-log-btn:hover {
     color: rgb(48, 48, 48);
-    background-color: solid 1px rgb(48, 48, 48);
+    border: solid 1px rgb(48,48,48);
 }
 
 
 .authentication-modal {
     position: absolute;
-    top: 60px;
     left: 0;
     right: 0;
     height: 600px;
@@ -112,7 +114,7 @@ nav .log-button:disabled {
     margin-left: auto;
     border-radius: 12px;
     background-color: rgb(255, 255, 255);
-    color: red;
+    color: rgb(48, 48, 48);
 }
 
 .authentication-modal .close-modal {
